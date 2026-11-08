@@ -85,29 +85,6 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 
 Коэффициенты в агрегатах пересчитаны из сумм. Среднее из процентов отказов или конверсии не используется.
 
-## Как подключить к Power BI
-
-1. Откройте Power BI Desktop.
-2. **Главная → Получить данные → Текст/CSV**.
-3. Выберите `data/processed/powerbi_ready.csv`.
-4. Кодировка — UTF-8. Разделитель — запятая.
-5. Проверьте тип поля `date` (дата) и нажмите **Закрыть и применить**.
-
-Для тепловой карты по часам загрузите вторым запросом `data/processed/hourly_activity.csv` и свяжите таблицы по полю `date` (многие ко многим не нужны: связь «часы» → «дата» в направлении от почасовой таблицы к календарю, если заведёте отдельную таблицу дат).
-
-Колонки `bounce_rate`, `avg_session_duration`, `pages_per_session`, `conversion_rate`, `revenue_per_session` и `new_vs_returning` уже посчитаны на уровне строки. В визуализации их суммировать нечего: создайте меры от аддитивных полей.
-
-```dax
-Сессии = SUM ( metrics[sessions] )
-Конверсия % = DIVIDE ( SUM ( metrics[conversions] ), [Сессии] ) * 100
-Отказы % = DIVIDE ( SUM ( metrics[bounced_sessions] ), [Сессии] ) * 100
-Время сессии, сек = DIVIDE ( SUM ( metrics[total_duration_sec] ), [Сессии] )
-Страниц за сессию = DIVIDE ( SUM ( metrics[pageviews] ), [Сессии] )
-Выручка на сессию = DIVIDE ( SUM ( metrics[revenue] ), [Сессии] )
-Доля новых % = DIVIDE ( SUM ( metrics[new_users] ), SUM ( metrics[users] ) ) * 100
-```
-
-`metrics` замените на имя таблицы в модели. Для срезов удобны `traffic_source_ru`, `device_type_ru`, `country`, `browser`, `os`, `month_name`.
 
 ## Структура проекта
 
